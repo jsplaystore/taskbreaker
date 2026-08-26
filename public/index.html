@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>TaskBreaker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="style.css" />
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -18,12 +21,12 @@
   <section id="connect-bar" class="panel connect-bar">
     <span class="connect-group">
       <button id="connect-google-btn" class="connect-btn">Connect Google Calendar</button>
-      <button id="edit-google-setup-btn" class="edit-setup-btn" title="Change Google Client ID">edit</button>
+      <button id="edit-google-setup-btn" class="edit-setup-btn" title="Change Google Client ID" aria-label="Change Google Client ID"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>
     </span>
     <button id="import-classroom-btn" class="connect-btn hidden">Import from Classroom</button>
     <span class="connect-group">
       <button id="import-canvas-btn" class="connect-btn">Import from Canvas</button>
-      <button id="edit-canvas-setup-btn" class="edit-setup-btn" title="Change Canvas credentials">edit</button>
+      <button id="edit-canvas-setup-btn" class="edit-setup-btn" title="Change Canvas credentials" aria-label="Change Canvas credentials"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>
     </span>
     <span id="connect-status" class="connect-status"></span>
   </section>
@@ -86,7 +89,7 @@
     <label for="task-input">What's the big overwhelming task?</label>
     <div class="input-with-mic">
       <textarea id="task-input" placeholder="e.g. write the history essay, clean my entire room, do my taxes..."></textarea>
-      <button id="mic-task-btn" class="mic-btn" title="Speak instead">mic</button>
+      <button id="mic-task-btn" class="mic-btn" title="Speak instead" aria-label="Speak instead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></button>
     </div>
 
     <div class="upload-row">
@@ -149,7 +152,7 @@
       <p id="checkin-prompt">What are you working on right now?</p>
       <div class="checkin-row">
         <input type="text" id="checkin-input" placeholder="Type what you're doing..." />
-        <button id="mic-checkin-btn" class="mic-btn" title="Speak instead">mic</button>
+        <button id="mic-checkin-btn" class="mic-btn" title="Speak instead" aria-label="Speak instead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></button>
         <button id="checkin-send">Send</button>
       </div>
       <div id="checkin-response" class="checkin-response hidden"></div>

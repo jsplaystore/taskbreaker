@@ -69,7 +69,7 @@ function stripHtml(html, maxLength = 2000) {
 
 async function getJson(messages, opts, parser = JSON.parse) {
   let lastErr;
-  for (let attempt = 0; attempt < 2; attempt++) {
+  for (let attempt = 0; attempt < 3; attempt++) {
     const content = await callGroq(messages, opts);
     try {
       return parser(content);

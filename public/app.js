@@ -570,6 +570,7 @@ function updateProgress() {
   els.progressLabel.textContent = `${done} / ${all.length} done`;
   if (all.length && done === all.length) {
     fireConfetti(true);
+    playChime(true);
   }
 }
 
@@ -583,6 +584,31 @@ function fireConfetti(big) {
   });
 }
 
+let audioCtx = null;
+function playChime(big) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const notes = big ? [523.25, 659.25, 783.99, 1046.5] : [659.25, 987.77];
+    const now = audioCtx.currentTime;
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const start = now + i * 0.09;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.15, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(start);
+      osc.stop(start + 0.4);
+    });
+  } catch {
+    // Web Audio unavailable, skip the chime silently
+  }
+}
+
 function stepItemHtml(step, globalIndex, isCurrent) {
   const locked = state.requirePhoto && !step.done;
   return `
@@ -591,7 +617,7 @@ function stepItemHtml(step, globalIndex, isCurrent) {
       <div class="step-body">
         <div class="step-title">${escapeHtml(step.title)}</div>
         <div class="step-meta">~${step.minutes} min${step.why ? ' · ' + escapeHtml(step.why) : ''}</div>
-        <button class="verify-photo-btn" data-verify-index="${globalIndex}">Verify with photo</button>
+        <button class="verify-photo-btn" data-verify-index="${globalIndex}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg> Verify with photo</button>
         ${locked ? '<div class="verify-required-note">A photo is required to check this off</div>' : ''}
         <div class="verify-result hidden" data-verify-result="${globalIndex}"></div>
         <input type="file" accept="image/*" class="visually-hidden" data-verify-file="${globalIndex}" />
@@ -632,7 +658,10 @@ function setStepDone(globalIndex, done) {
   const step = all[globalIndex];
   if (!step) return;
   step.done = done;
-  if (done) fireConfetti(false);
+  if (done) {
+    fireConfetti(false);
+    playChime(false);
+  }
   render();
 }
 
