@@ -177,10 +177,6 @@ function connectGoogle() {
 }
 
 els.connectGoogleBtn.addEventListener('click', connectGoogle);
-$('edit-google-setup-btn').addEventListener('click', () => {
-  googleClientIdInput.value = state.googleClientId || '';
-  openModal(googleModal);
-});
 $('google-setup-cancel').addEventListener('click', () => closeModal(googleModal));
 $('google-setup-save').addEventListener('click', () => {
   const value = googleClientIdInput.value.trim();
@@ -259,11 +255,6 @@ async function fetchCanvasAssignments() {
 }
 
 els.importCanvasBtn.addEventListener('click', importCanvas);
-$('edit-canvas-setup-btn').addEventListener('click', () => {
-  canvasUrlInput.value = state.canvasUrl || '';
-  canvasTokenInput.value = state.canvasToken || '';
-  openModal(canvasModal);
-});
 $('canvas-setup-cancel').addEventListener('click', () => closeModal(canvasModal));
 $('canvas-setup-save').addEventListener('click', () => {
   const url = canvasUrlInput.value.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');

@@ -148,20 +148,6 @@ button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 /* Connect bar */
 .connect-bar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; padding: 1.1rem 1.5rem; }
 .connect-status { color: #7a6f5e; font-size: 0.9rem; }
-.connect-group { display: inline-flex; gap: 0.4rem; align-items: center; }
-.edit-setup-btn {
-  margin: 0;
-  padding: 0.5rem;
-  width: 2.1rem;
-  height: 2.1rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--accent-soft);
-  color: var(--accent);
-  border-radius: 999px;
-  box-shadow: none;
-}
 
 /* Setup modals */
 .modal-overlay {
