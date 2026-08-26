@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TaskBreaker</title>
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+<header>
+  <h1>TaskBreaker <span id="streak-badge" class="streak-badge hidden">0 day streak</span></h1>
+  <p class="tagline">Turn the big vague thing into steps you can actually start.</p>
+</header>
+
+<main>
+  <section id="connect-bar" class="panel connect-bar">
+    <span class="connect-group">
+      <button id="connect-google-btn" class="connect-btn">Connect Google Calendar</button>
+      <button id="edit-google-setup-btn" class="edit-setup-btn" title="Change Google Client ID">edit</button>
+    </span>
+    <button id="import-classroom-btn" class="connect-btn hidden">Import from Classroom</button>
+    <span class="connect-group">
+      <button id="import-canvas-btn" class="connect-btn">Import from Canvas</button>
+      <button id="edit-canvas-setup-btn" class="edit-setup-btn" title="Change Canvas credentials">edit</button>
+    </span>
+    <span id="connect-status" class="connect-status"></span>
+  </section>
+
+  <div id="google-setup-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>Connect Google Calendar and Classroom</h3>
+      <p>This talks to Google directly from your browser. Nothing is stored on our server, only locally on this device. You need your own free OAuth client ID:</p>
+      <ol>
+        <li>Go to <strong>console.cloud.google.com</strong>, create or pick a project.</li>
+        <li><strong>APIs and Services &gt; Credentials &gt; Create Credentials &gt; OAuth client ID</strong>, type "Web application".</li>
+        <li>Under "Authorized JavaScript origins", add <code id="origin-hint-1"></code>.</li>
+        <li><strong>APIs and Services &gt; Library</strong>: enable the <strong>Google Calendar API</strong> and <strong>Google Classroom API</strong>.</li>
+        <li><strong>APIs and Services &gt; OAuth consent screen &gt; Audience</strong>: add your own Google account under "Test users" (needed for Classroom scopes while the app is unverified).</li>
+        <li>Copy the <strong>Client ID</strong> (looks like <code>123-abc.apps.googleusercontent.com</code>) and paste it below.</li>
+      </ol>
+      <label for="google-client-id-input">Google OAuth client ID</label>
+      <input type="text" id="google-client-id-input" placeholder="xxxxxxxx.apps.googleusercontent.com" />
+      <div class="modal-actions">
+        <button id="google-setup-cancel" class="secondary-btn">Cancel</button>
+        <button id="google-setup-save">Save and connect</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="canvas-setup-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>Connect Canvas</h3>
+      <p>Your access token is sent only to this app's own server for the request, not stored on disk or shared elsewhere. You can revoke it in Canvas any time.</p>
+      <ol>
+        <li>Log into Canvas, go to <strong>Account &gt; Settings</strong>.</li>
+        <li>Scroll to "Approved Integrations", click <strong>New Access Token</strong>.</li>
+        <li>Give it any purpose name, generate it, copy the token (it's only shown once).</li>
+        <li>Enter your Canvas domain and the token below.</li>
+      </ol>
+      <label for="canvas-url-input">Canvas domain</label>
+      <input type="text" id="canvas-url-input" placeholder="yourschool.instructure.com" />
+      <label for="canvas-token-input">Access token</label>
+      <input type="text" id="canvas-token-input" placeholder="paste token here" />
+      <div class="modal-actions">
+        <button id="canvas-setup-cancel" class="secondary-btn">Cancel</button>
+        <button id="canvas-setup-save">Save and import</button>
+      </div>
+    </div>
+  </div>
+
+  <section id="input-panel" class="panel">
+    <label class="toggle-row" for="require-photo-toggle">
+      <input type="checkbox" id="require-photo-toggle" />
+      Require a photo before a step can be checked off (leave off if you'd rather just check things off yourself)
+    </label>
+
+    <label>How's your energy right now?</label>
+    <div class="energy-row" id="energy-row">
+      <button class="energy-btn" data-energy="low">Low</button>
+      <button class="energy-btn selected" data-energy="medium">Medium</button>
+      <button class="energy-btn" data-energy="high">High</button>
+    </div>
+
+    <label for="task-input">What's the big overwhelming task?</label>
+    <div class="input-with-mic">
+      <textarea id="task-input" placeholder="e.g. write the history essay, clean my entire room, do my taxes..."></textarea>
+      <button id="mic-task-btn" class="mic-btn" title="Speak instead">mic</button>
+    </div>
+
+    <div class="upload-row">
+      <label class="upload-btn">
+        Upload a photo of the room or item
+        <input type="file" id="photo-input" accept="image/*" class="visually-hidden" />
+      </label>
+      <label class="upload-btn">
+        Import from a screenshot (email or syllabus)
+        <input type="file" id="screenshot-input" accept="image/*" class="visually-hidden" />
+      </label>
+    </div>
+    <div id="photo-preview-wrap" class="photo-preview-wrap hidden">
+      <img id="photo-preview" alt="Uploaded preview" />
+      <button id="clear-photo-btn" class="clear-photo-btn">Remove photo</button>
+    </div>
+
+    <div class="row-2col">
+      <label class="inline-label">Time available (min)
+        <input type="number" id="minutes-input" min="5" max="480" placeholder="e.g. 45" />
+      </label>
+      <label class="inline-label">Deadline (optional)
+        <input type="date" id="deadline-input" />
+      </label>
+    </div>
+
+    <button id="breakdown-btn">Break it down</button>
+    <p id="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section id="canvas-picker" class="panel hidden">
+    <h3>Pick an assignment</h3>
+    <ul id="canvas-list"></ul>
+    <button id="canvas-picker-close" class="secondary-btn">Close</button>
+  </section>
+
+  <section id="steps-panel" class="panel hidden">
+    <div class="steps-header">
+      <h2 id="task-title"></h2>
+      <button id="restart-btn">New task</button>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar-track"><div id="progress-bar-fill" class="progress-bar-fill"></div></div>
+      <span id="progress-label">0 / 0 done</span>
+    </div>
+
+    <div class="steps-actions">
+      <button id="panic-btn" class="panic-btn">I'm overwhelmed, just give me one thing</button>
+      <button id="sync-calendar-btn" class="secondary-btn hidden">Add steps to Google Calendar</button>
+    </div>
+
+    <div id="panic-view" class="panic-view hidden"></div>
+
+    <div id="steps-container"></div>
+  </section>
+
+  <section id="checkin-panel" class="panel hidden">
+    <div class="checkin-box">
+      <p id="checkin-prompt">What are you working on right now?</p>
+      <div class="checkin-row">
+        <input type="text" id="checkin-input" placeholder="Type what you're doing..." />
+        <button id="mic-checkin-btn" class="mic-btn" title="Speak instead">mic</button>
+        <button id="checkin-send">Send</button>
+      </div>
+      <div id="checkin-response" class="checkin-response hidden"></div>
+      <label class="interval-label">Check in every
+        <select id="interval-select">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="15">15</option>
+          <option value="25">25</option>
+        </select>
+        minutes
+        <button id="timer-toggle">Start timer</button>
+        <span id="timer-display"></span>
+      </label>
+      <label class="toggle-row" for="voice-checkin-toggle">
+        <input type="checkbox" id="voice-checkin-toggle" checked />
+        Speak the check-in question out loud and listen for my answer
+      </label>
+      <label class="inline-label voice-picker-row">Voice
+        <select id="tts-voice-select"></select>
+      </label>
+    </div>
+  </section>
+</main>
+
+<div id="confetti-canvas-anchor"></div>
+<script src="app.js"></script>
+</body>
+</html>
