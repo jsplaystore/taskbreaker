@@ -126,8 +126,10 @@ async function loadServerDefaults() {
   try {
     const res = await fetch('/api/config');
     const cfg = await res.json();
+    state.demoMode = Boolean(cfg.demoMode);
     if (!state.googleClientId && cfg.googleClientId) state.googleClientId = cfg.googleClientId;
     if (!state.canvasUrl && cfg.canvasUrl) state.canvasUrl = cfg.canvasUrl;
+    if (state.demoMode && !state.canvasToken) state.canvasToken = 'demo';
   } catch {
     // no server defaults available, that's fine, setup modals cover it
   }
@@ -219,7 +221,7 @@ els.importClassroomBtn.addEventListener('click', async () => {
 });
 
 function importCanvas() {
-  if (!state.canvasUrl || !state.canvasToken) {
+  if (!state.demoMode && (!state.canvasUrl || !state.canvasToken)) {
     canvasUrlInput.value = state.canvasUrl || '';
     canvasTokenInput.value = '';
     openModal(canvasModal);

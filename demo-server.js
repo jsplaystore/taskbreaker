@@ -40,6 +40,15 @@ const FAKE_ASSIGNMENTS = [
   },
 ];
 
+demoApp.get('/api/config', (req, res) => {
+  res.json({
+    googleClientId: process.env.GOOGLE_CLIENT_ID || null,
+    canvasUrl: 'demo.instructure.com',
+    canvasConfigured: true,
+    demoMode: true,
+  });
+});
+
 demoApp.post('/api/canvas/assignments', express.json(), (req, res) => {
   res.json({ assignments: FAKE_ASSIGNMENTS });
 });

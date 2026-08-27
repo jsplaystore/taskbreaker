@@ -313,6 +313,7 @@ app.get('/api/config', (req, res) => {
     googleClientId: process.env.GOOGLE_CLIENT_ID || null,
     canvasUrl: process.env.CANVAS_URL || null,
     canvasConfigured: Boolean(process.env.CANVAS_URL && process.env.CANVAS_TOKEN),
+    demoMode: false,
   });
 });
 
