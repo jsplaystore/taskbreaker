@@ -38,8 +38,8 @@ Challenges we ran into
 The biggest one was the vision model itself. It's a reasoning model, and by default it would "think out loud" before answering,         sometimes for over a thousand tokens, occasionally gealternate plans that it ran out of its token budgetbefore ever producing the JSON we needed. The fix ended up being two-fold: explicitly telling it to keep its reasoning to a few         sentences, and writing a parser that strips <think> barkdown code fences rather than assuming a cleanresponse.                                                                                                                               
 The second challenge was capacity. The vision model's free tier caps out at 8000 tokens per minute, and each photo call costs somewhere between 1800 and 2800 tokens once you count the image, the reasoning, and the JSON output:
 
-$$                                                                                                                                      \frac{8000\ \text{tokens/min}}{\approx 2200\ \text{tot{calls per minute}
-$$                                                                                                                                      
+$$\frac{8000\ \text{tokens/min}}{\approx 2200\ \text{tot{calls per minute}$$
+
 
 That's not a lot of headroom for a live demo where someone might upload a photo, verify a step, and import a screenshot back to back. We added automatic retry-with-backoff that reads the "try again in Xs" hint straight out of the error message, so the app quietly waits    and retries instead of just failing in front of a jud
 
