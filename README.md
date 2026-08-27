@@ -40,6 +40,7 @@ The second challenge was capacity. The vision model's free tier caps out at 8000
 
 $$                                                                                                                                      \frac{8000\ \text{tokens/min}}{\approx 2200\ \text{tot{calls per minute}
 $$                                                                                                                                      
+
 That's not a lot of headroom for a live demo where someone might upload a photo, verify a step, and import a screenshot back to back. We added automatic retry-with-backoff that reads the "try again in Xs" hint straight out of the error message, so the app quietly waits    and retries instead of just failing in front of a jud
 
 The last real challenge was scope. Alex's actual problem is narrow: getting from "nothing started" to "something started." It was tempting to keep adding integrations, and we did end up building quite a few (Canvas, Classroom, Google Calendar, backward planning,    panic mode), but every feature had to earn its place ller or that first two minutes easier, or it didn'tbelong.
