@@ -5,7 +5,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "demo": "node demo-server.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

@@ -357,7 +357,8 @@ app.post('/api/canvas/assignments', async (req, res) => {
   }
 });
 
-if (!process.env.VERCEL) {
+const isMain = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+if (isMain && !process.env.VERCEL) {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => console.log(`taskbreaker running on http://localhost:${PORT}`));
 }

@@ -676,7 +676,8 @@ els.stepsContainer.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
   const step = allStepsFlat()[idx];
-  const resultEl = els.stepsContainer.querySelector(`[data-verify-result="${idx}"]`);
+  const getResultEl = () => els.stepsContainer.querySelector(`[data-verify-result="${idx}"]`);
+  let resultEl = getResultEl();
   resultEl.classList.remove('hidden');
   resultEl.textContent = 'Checking photo…';
   try {
@@ -688,17 +689,22 @@ els.stepsContainer.addEventListener('change', async (e) => {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
-    resultEl.textContent = data.message;
-    resultEl.className = 'verify-result ' + (data.confirmed ? 'confirmed' : 'unsure');
-    if (data.confirmed && !step.done) {
-      setStepDone(idx, true);
-      document.querySelector(`.step-item[data-index="${idx}"] input[type=checkbox]`)?.setAttribute('checked', 'checked');
+    // setStepDone triggers a full re-render, which replaces this DOM node,
+    // so re-query it fresh afterward instead of writing to the stale reference.
+    if (data.confirmed && !step.done) setStepDone(idx, true);
+    resultEl = getResultEl();
+    if (resultEl) {
+      resultEl.classList.remove('hidden');
+      resultEl.textContent = data.message;
+      resultEl.className = 'verify-result ' + (data.confirmed ? 'confirmed' : 'unsure');
     }
   } catch (err) {
+    resultEl = getResultEl() || resultEl;
     resultEl.textContent = 'Could not verify: ' + err.message;
     resultEl.className = 'verify-result unsure';
   } finally {
-    e.target.value = '';
+    const freshFileInput = els.stepsContainer.querySelector(`[data-verify-file="${idx}"]`);
+    if (freshFileInput) freshFileInput.value = '';
   }
 });
 
